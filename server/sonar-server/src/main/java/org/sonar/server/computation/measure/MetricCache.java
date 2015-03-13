@@ -17,33 +17,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.api.rule;
 
-import com.google.common.collect.ImmutableList;
+package org.sonar.server.computation.measure;
 
-import java.util.List;
+import org.sonar.core.measure.db.MetricDto;
+import org.sonar.server.util.cache.MemoryCache;
 
-/**
- * @since 3.6
- */
-public final class Severity {
-
-  public static final String INFO = "INFO";
-  public static final String MINOR = "MINOR";
-  public static final String MAJOR = "MAJOR";
-  public static final String CRITICAL = "CRITICAL";
-  public static final String BLOCKER = "BLOCKER";
-
-  /**
-   * All the supported severity values, ordered from {@link #INFO} to {@link #BLOCKER}.
-   */
-  public static final List<String> ALL = ImmutableList.of(INFO, MINOR, MAJOR, CRITICAL, BLOCKER);
-
-  private Severity() {
-    // utility
-  }
-
-  public static String defaultSeverity() {
-    return MAJOR;
+public class MetricCache extends MemoryCache<String, MetricDto> {
+  public MetricCache(MetricCacheLoader loader) {
+    super(loader);
   }
 }

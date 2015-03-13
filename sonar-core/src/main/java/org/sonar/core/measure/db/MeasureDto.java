@@ -21,15 +21,12 @@
 package org.sonar.core.measure.db;
 
 import com.google.common.base.Charsets;
-import org.sonar.api.rules.RulePriority;
+import org.sonar.api.rule.Severity;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 
-import java.util.Date;
-
-import static org.sonar.api.utils.DateUtils.dateToLong;
-import static org.sonar.api.utils.DateUtils.longToDate;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class MeasureDto {
   private static final String INDEX_SHOULD_BE_IN_RANGE_FROM_1_TO_5 = "Index should be in range from 1 to 5";
@@ -38,19 +35,17 @@ public class MeasureDto {
   private Long id;
   private Double value;
   private String textValue;
-  private Integer tendency;
   private byte[] measureData;
+  private Integer tendency;
   private Double variation1, variation2, variation3, variation4, variation5;
-  private Long measureDateMs;
   private String alertStatus;
   private String alertText;
-  private String url;
   private String description;
   private Integer severityIndex;
 
-  private Integer projectId;
+  private Long projectId;
+  private Long snapshotId;
   private Integer metricId;
-  private Integer snapshotId;
   private Integer ruleId;
   private Integer characteristicId;
   private Integer personId;
@@ -118,7 +113,7 @@ public class MeasureDto {
     }
   }
 
-  public MeasureDto setVariation(int index, Double d) {
+  public MeasureDto setVariation(int index, @Nullable Double d) {
     switch (index) {
       case 1:
         variation1 = d;
@@ -145,17 +140,8 @@ public class MeasureDto {
     return tendency;
   }
 
-  public MeasureDto setTendency(Integer tendency) {
+  public MeasureDto setTendency(@Nullable Integer tendency) {
     this.tendency = tendency;
-    return this;
-  }
-
-  public Date getDate() {
-    return longToDate(measureDateMs);
-  }
-
-  public MeasureDto setDate(Date date) {
-    this.measureDateMs = dateToLong(date);
     return this;
   }
 
@@ -163,7 +149,7 @@ public class MeasureDto {
     return alertStatus;
   }
 
-  public MeasureDto setAlertStatus(String alertStatus) {
+  public MeasureDto setAlertStatus(@Nullable String alertStatus) {
     this.alertStatus = alertStatus;
     return this;
   }
@@ -172,17 +158,8 @@ public class MeasureDto {
     return alertText;
   }
 
-  public MeasureDto setAlertText(String alertText) {
+  public MeasureDto setAlertText(@Nullable String alertText) {
     this.alertText = alertText;
-    return this;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public MeasureDto setUrl(String url) {
-    this.url = url;
     return this;
   }
 
@@ -190,26 +167,17 @@ public class MeasureDto {
     return description;
   }
 
-  public MeasureDto setDescription(String description) {
+  public MeasureDto setDescription(@Nullable String description) {
     this.description = description;
     return this;
   }
 
-  public RulePriority getSeverity() {
-    return RulePriority.valueOfInt(severityIndex);
-  }
-
-  public MeasureDto setSeverity(RulePriority severity) {
-    this.severityIndex = severity.ordinal();
-    return this;
-  }
-
-  public Integer getProjectId() {
+  public Long getComponentId() {
     return projectId;
   }
 
-  public MeasureDto setProjectId(Integer projectId) {
-    this.projectId = projectId;
+  public MeasureDto setComponentId(Long componentId) {
+    this.projectId = componentId;
     return this;
   }
 
@@ -222,11 +190,11 @@ public class MeasureDto {
     return this;
   }
 
-  public Integer getSnapshotId() {
+  public Long getSnapshotId() {
     return snapshotId;
   }
 
-  public MeasureDto setSnapshotId(Integer snapshotId) {
+  public MeasureDto setSnapshotId(Long snapshotId) {
     this.snapshotId = snapshotId;
     return this;
   }
@@ -244,7 +212,7 @@ public class MeasureDto {
     return characteristicId;
   }
 
-  public MeasureDto setCharacteristicId(Integer characteristicId) {
+  public MeasureDto setCharacteristicId(@Nullable Integer characteristicId) {
     this.characteristicId = characteristicId;
     return this;
   }
@@ -274,5 +242,29 @@ public class MeasureDto {
   public MeasureDto setComponentKey(String componentKey) {
     this.componentKey = componentKey;
     return this;
+  }
+
+  public MeasureDto setSeverity(@Nullable String severity) {
+    if (severity == null) {
+      return this;
+    }
+    checkArgument(Severity.ALL.contains(severity), "Severity must be included in the org.sonar.api.rule.Severity values");
+
+    for (int i = 0; i < Severity.ALL.size(); i++) {
+      if (Severity.ALL.get(i).equals(severity)) {
+        this.severityIndex = i;
+        return this;
+      }
+    }
+
+    return this;
+  }
+
+  public String getSeverity() {
+    if (severityIndex == null) {
+      return null;
+    }
+
+    return Severity.ALL.get(severityIndex);
   }
 }
