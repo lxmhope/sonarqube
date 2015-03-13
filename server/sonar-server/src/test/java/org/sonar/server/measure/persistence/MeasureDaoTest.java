@@ -23,12 +23,11 @@ package org.sonar.server.measure.persistence;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonar.api.rules.RulePriority;
+import org.sonar.api.rule.Severity;
 import org.sonar.core.measure.db.MeasureDto;
 import org.sonar.core.persistence.AbstractDaoTestCase;
 import org.sonar.core.persistence.DbSession;
 
-import java.util.Date;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -132,29 +131,24 @@ public class MeasureDaoTest extends AbstractDaoTestCase {
     setupData("empty");
 
     sut.insert(session, new MeasureDto()
-      .setComponentKey("org.struts:struts-core:src/org/struts/RequestContext.java")
-      .setMetricKey("ncloc")
-      .setSnapshotId(2)
-      .setMetricId(3)
-      .setCharacteristicId(4)
-      .setRuleId(5)
-      .setProjectId(6)
-      .setPersonId(7)
-      .setValue(2.5)
-      .setData("measure-value")
-      .setTendency(42)
-      .setSeverity(RulePriority.valueOfInt(0))
-      .setDate(new Date(12345678987654321L))
-      .setVariation(1, 1.1d)
-      .setVariation(2, 2.2d)
-      .setVariation(3, 3.3)
-      .setVariation(4, 4.4)
-      .setVariation(5, 5.5)
-      .setAlertStatus("alert")
-      .setAlertText("alert-text")
-      .setUrl("www.measures.com")
-      .setDescription("measure-description")
-      );
+        .setSnapshotId(2L)
+        .setMetricId(3)
+        .setCharacteristicId(4)
+        .setRuleId(5)
+        .setComponentId(6L)
+        .setValue(2.5)
+        .setData("measure-value")
+        .setTendency(42)
+        .setSeverity(Severity.INFO)
+        .setVariation(1, 1.1d)
+        .setVariation(2, 2.2d)
+        .setVariation(3, 3.3)
+        .setVariation(4, 4.4)
+        .setVariation(5, 5.5)
+        .setAlertStatus("alert")
+        .setAlertText("alert-text")
+        .setDescription("measure-description")
+    );
     session.commit();
 
     checkTable("insert", "project_measures");

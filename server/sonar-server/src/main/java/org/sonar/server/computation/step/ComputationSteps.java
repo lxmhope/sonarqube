@@ -38,6 +38,7 @@ public class ComputationSteps {
   public static List<Class<? extends ComputationStep>> orderedStepClasses() {
     return Arrays.asList(
       ParseReportStep.class,
+      PersistMeasuresStep.class,
       PersistIssuesStep.class,
       SwitchSnapshotStep.class,
       IndexComponentsStep.class,

@@ -2587,20 +2587,6 @@ public final class BatchReport {
      * <code>optional int32 characteric_id = 20;</code>
      */
     int getCharactericId();
-
-    /**
-     * <code>optional string url = 21;</code>
-     */
-    boolean hasUrl();
-    /**
-     * <code>optional string url = 21;</code>
-     */
-    java.lang.String getUrl();
-    /**
-     * <code>optional string url = 21;</code>
-     */
-    com.google.protobuf.ByteString
-        getUrlBytes();
   }
   /**
    * Protobuf type {@code Measure}
@@ -2765,12 +2751,6 @@ public final class BatchReport {
             case 160: {
               bitField0_ |= 0x00040000;
               charactericId_ = input.readInt32();
-              break;
-            }
-            case 170: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00080000;
-              url_ = bs;
               break;
             }
           }
@@ -3272,48 +3252,6 @@ public final class BatchReport {
       return charactericId_;
     }
 
-    public static final int URL_FIELD_NUMBER = 21;
-    private java.lang.Object url_;
-    /**
-     * <code>optional string url = 21;</code>
-     */
-    public boolean hasUrl() {
-      return ((bitField0_ & 0x00080000) == 0x00080000);
-    }
-    /**
-     * <code>optional string url = 21;</code>
-     */
-    public java.lang.String getUrl() {
-      java.lang.Object ref = url_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          url_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string url = 21;</code>
-     */
-    public com.google.protobuf.ByteString
-        getUrlBytes() {
-      java.lang.Object ref = url_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        url_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
     private void initFields() {
       valueType_ = org.sonar.batch.protocol.Constants.MeasureValueType.INT;
       booleanValue_ = false;
@@ -3334,7 +3272,6 @@ public final class BatchReport {
       variationValue5_ = 0D;
       tendency_ = 0;
       charactericId_ = 0;
-      url_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3405,9 +3342,6 @@ public final class BatchReport {
       }
       if (((bitField0_ & 0x00040000) == 0x00040000)) {
         output.writeInt32(20, charactericId_);
-      }
-      if (((bitField0_ & 0x00080000) == 0x00080000)) {
-        output.writeBytes(21, getUrlBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3493,10 +3427,6 @@ public final class BatchReport {
       if (((bitField0_ & 0x00040000) == 0x00040000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(20, charactericId_);
-      }
-      if (((bitField0_ & 0x00080000) == 0x00080000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(21, getUrlBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3653,8 +3583,6 @@ public final class BatchReport {
         bitField0_ = (bitField0_ & ~0x00020000);
         charactericId_ = 0;
         bitField0_ = (bitField0_ & ~0x00040000);
-        url_ = "";
-        bitField0_ = (bitField0_ & ~0x00080000);
         return this;
       }
 
@@ -3759,10 +3687,6 @@ public final class BatchReport {
           to_bitField0_ |= 0x00040000;
         }
         result.charactericId_ = charactericId_;
-        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
-          to_bitField0_ |= 0x00080000;
-        }
-        result.url_ = url_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3847,11 +3771,6 @@ public final class BatchReport {
         }
         if (other.hasCharactericId()) {
           setCharactericId(other.getCharactericId());
-        }
-        if (other.hasUrl()) {
-          bitField0_ |= 0x00080000;
-          url_ = other.url_;
-          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -4778,82 +4697,6 @@ public final class BatchReport {
       public Builder clearCharactericId() {
         bitField0_ = (bitField0_ & ~0x00040000);
         charactericId_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object url_ = "";
-      /**
-       * <code>optional string url = 21;</code>
-       */
-      public boolean hasUrl() {
-        return ((bitField0_ & 0x00080000) == 0x00080000);
-      }
-      /**
-       * <code>optional string url = 21;</code>
-       */
-      public java.lang.String getUrl() {
-        java.lang.Object ref = url_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            url_ = s;
-          }
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string url = 21;</code>
-       */
-      public com.google.protobuf.ByteString
-          getUrlBytes() {
-        java.lang.Object ref = url_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          url_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string url = 21;</code>
-       */
-      public Builder setUrl(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00080000;
-        url_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string url = 21;</code>
-       */
-      public Builder clearUrl() {
-        bitField0_ = (bitField0_ & ~0x00080000);
-        url_ = getDefaultInstance().getUrl();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string url = 21;</code>
-       */
-      public Builder setUrlBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00080000;
-        url_ = value;
         onChanged();
         return this;
       }
@@ -10156,7 +9999,7 @@ public final class BatchReport {
       "\030\004 \001(\0162\016.ComponentType\022\017\n\007is_test\030\005 \001(\010\022" +
       "\020\n\010language\030\006 \001(\t\022\026\n\nchild_refs\030\007 \003(\005B\002\020" +
       "\001\022\023\n\013snapshot_id\030\010 \001(\003\022\014\n\004uuid\030\t \001(\t\022\n\n\002" +
-      "id\030\n \001(\003\"\332\003\n\007Measure\022%\n\nvalue_type\030\001 \001(\016",
+      "id\030\n \001(\003\"\315\003\n\007Measure\022%\n\nvalue_type\030\001 \001(\016",
       "2\021.MeasureValueType\022\025\n\rboolean_value\030\002 \001" +
       "(\010\022\021\n\tint_value\030\003 \001(\005\022\022\n\nlong_value\030\004 \001(" +
       "\003\022\024\n\014double_value\030\005 \001(\001\022\024\n\014string_value\030" +
@@ -10167,26 +10010,25 @@ public final class BatchReport {
       "(\001\022\031\n\021variation_value_2\030\017 \001(\001\022\031\n\021variati" +
       "on_value_3\030\020 \001(\001\022\031\n\021variation_value_4\030\021 " +
       "\001(\001\022\031\n\021variation_value_5\030\022 \001(\001\022\020\n\010tenden",
-      "cy\030\023 \001(\005\022\026\n\016characteric_id\030\024 \001(\005\022\013\n\003url\030" +
-      "\025 \001(\t\"<\n\010Measures\022\025\n\rcomponent_ref\030\001 \001(\005" +
-      "\022\031\n\007measure\030\002 \003(\0132\010.Measure\"\232\004\n\005Issue\022\027\n" +
-      "\017rule_repository\030\001 \001(\t\022\020\n\010rule_key\030\002 \001(\t" +
-      "\022\014\n\004line\030\003 \001(\005\022\013\n\003msg\030\004 \001(\t\022\033\n\010severity\030" +
-      "\005 \001(\0162\t.Severity\022\014\n\004tags\030\006 \003(\t\022\025\n\reffort" +
-      "_to_fix\030\007 \001(\001\022\016\n\006is_new\030\010 \001(\010\022\014\n\004uuid\030\t " +
-      "\001(\t\022\027\n\017debt_in_minutes\030\n \001(\003\022\022\n\nresoluti" +
-      "on\030\013 \001(\t\022\016\n\006status\030\014 \001(\t\022\020\n\010checksum\030\r \001" +
-      "(\t\022\027\n\017manual_severity\030\016 \001(\010\022\020\n\010reporter\030",
-      "\017 \001(\t\022\020\n\010assignee\030\020 \001(\t\022\027\n\017action_plan_k" +
-      "ey\030\021 \001(\t\022\022\n\nattributes\030\022 \001(\t\022\024\n\014author_l" +
-      "ogin\030\023 \001(\t\022\025\n\rcreation_date\030\024 \001(\003\022\022\n\nclo" +
-      "se_date\030\025 \001(\003\022\023\n\013update_date\030\026 \001(\003\022\023\n\013se" +
-      "lected_at\030\027 \001(\003\022\023\n\013diff_fields\030\030 \001(\t\022\022\n\n" +
-      "is_changed\030\031 \001(\010\022\036\n\026must_send_notificati" +
-      "on\030\032 \001(\010\"M\n\006Issues\022\025\n\rcomponent_ref\030\001 \001(" +
-      "\005\022\024\n\004list\030\002 \003(\0132\006.Issue\022\026\n\016component_uui" +
-      "d\030\003 \001(\tB#\n\037org.sonar.batch.protocol.outp" +
-      "utH\001"
+      "cy\030\023 \001(\005\022\026\n\016characteric_id\030\024 \001(\005\"<\n\010Meas" +
+      "ures\022\025\n\rcomponent_ref\030\001 \001(\005\022\031\n\007measure\030\002" +
+      " \003(\0132\010.Measure\"\232\004\n\005Issue\022\027\n\017rule_reposit" +
+      "ory\030\001 \001(\t\022\020\n\010rule_key\030\002 \001(\t\022\014\n\004line\030\003 \001(" +
+      "\005\022\013\n\003msg\030\004 \001(\t\022\033\n\010severity\030\005 \001(\0162\t.Sever" +
+      "ity\022\014\n\004tags\030\006 \003(\t\022\025\n\reffort_to_fix\030\007 \001(\001" +
+      "\022\016\n\006is_new\030\010 \001(\010\022\014\n\004uuid\030\t \001(\t\022\027\n\017debt_i" +
+      "n_minutes\030\n \001(\003\022\022\n\nresolution\030\013 \001(\t\022\016\n\006s" +
+      "tatus\030\014 \001(\t\022\020\n\010checksum\030\r \001(\t\022\027\n\017manual_" +
+      "severity\030\016 \001(\010\022\020\n\010reporter\030\017 \001(\t\022\020\n\010assi",
+      "gnee\030\020 \001(\t\022\027\n\017action_plan_key\030\021 \001(\t\022\022\n\na" +
+      "ttributes\030\022 \001(\t\022\024\n\014author_login\030\023 \001(\t\022\025\n" +
+      "\rcreation_date\030\024 \001(\003\022\022\n\nclose_date\030\025 \001(\003" +
+      "\022\023\n\013update_date\030\026 \001(\003\022\023\n\013selected_at\030\027 \001" +
+      "(\003\022\023\n\013diff_fields\030\030 \001(\t\022\022\n\nis_changed\030\031 " +
+      "\001(\010\022\036\n\026must_send_notification\030\032 \001(\010\"M\n\006I" +
+      "ssues\022\025\n\rcomponent_ref\030\001 \001(\005\022\024\n\004list\030\002 \003" +
+      "(\0132\006.Issue\022\026\n\016component_uuid\030\003 \001(\tB#\n\037or" +
+      "g.sonar.batch.protocol.outputH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10218,7 +10060,7 @@ public final class BatchReport {
     internal_static_Measure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Measure_descriptor,
-        new java.lang.String[] { "ValueType", "BooleanValue", "IntValue", "LongValue", "DoubleValue", "StringValue", "MetricKey", "Description", "RuleKey", "Severity", "AlertStatus", "AlertText", "VariationValue1", "VariationValue2", "VariationValue3", "VariationValue4", "VariationValue5", "Tendency", "CharactericId", "Url", });
+        new java.lang.String[] { "ValueType", "BooleanValue", "IntValue", "LongValue", "DoubleValue", "StringValue", "MetricKey", "Description", "RuleKey", "Severity", "AlertStatus", "AlertText", "VariationValue1", "VariationValue2", "VariationValue3", "VariationValue4", "VariationValue5", "Tendency", "CharactericId", });
     internal_static_Measures_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_Measures_fieldAccessorTable = new

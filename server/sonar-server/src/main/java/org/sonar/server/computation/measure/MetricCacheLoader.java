@@ -17,33 +17,36 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.api.rule;
 
-import com.google.common.collect.ImmutableList;
+package org.sonar.server.computation.measure;
 
-import java.util.List;
+import org.sonar.core.measure.db.MetricDto;
+import org.sonar.core.persistence.DbSession;
+import org.sonar.server.db.DbClient;
+import org.sonar.server.util.cache.CacheLoader;
 
-/**
- * @since 3.6
- */
-public final class Severity {
+import java.util.Collection;
+import java.util.Map;
 
-  public static final String INFO = "INFO";
-  public static final String MINOR = "MINOR";
-  public static final String MAJOR = "MAJOR";
-  public static final String CRITICAL = "CRITICAL";
-  public static final String BLOCKER = "BLOCKER";
+public class MetricCacheLoader implements CacheLoader<String, MetricDto> {
 
-  /**
-   * All the supported severity values, ordered from {@link #INFO} to {@link #BLOCKER}.
-   */
-  public static final List<String> ALL = ImmutableList.of(INFO, MINOR, MAJOR, CRITICAL, BLOCKER);
+  private final DbClient dbClient;
 
-  private Severity() {
-    // utility
+  public MetricCacheLoader(DbClient dbClient) {
+    this.dbClient = dbClient;
   }
 
-  public static String defaultSeverity() {
-    return MAJOR;
+  @Override
+  public MetricDto load(String key) {
+    try (DbSession dbSession = dbClient.openSession(false)) {
+      return dbClient.metricDao().getNullableByKey(dbSession, key);
+    }
   }
+
+  @Override
+  public Map<String, MetricDto> loadAll(Collection<? extends String> keys) {
+    throw new UnsupportedOperationException("see MetricCacheLoader.load");
+  }
+
+
 }

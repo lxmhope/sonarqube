@@ -20,19 +20,16 @@
 
 package org.sonar.server.measure.persistence;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Function;
 import org.sonar.api.ServerComponent;
 import org.sonar.core.measure.db.MeasureDto;
 import org.sonar.core.measure.db.MeasureMapper;
 import org.sonar.core.persistence.DaoComponent;
+import org.sonar.core.persistence.DaoUtils;
 import org.sonar.core.persistence.DbSession;
 
 import javax.annotation.CheckForNull;
-
-import java.util.Collections;
 import java.util.List;
-
-import static com.google.common.collect.Lists.newArrayList;
 
 public class MeasureDao implements ServerComponent, DaoComponent {
 
@@ -45,16 +42,13 @@ public class MeasureDao implements ServerComponent, DaoComponent {
     return mapper(session).selectByComponentAndMetric(componentKey, metricKey);
   }
 
-  public List<MeasureDto> findByComponentKeyAndMetricKeys(DbSession session, String componentKey, List<String> metricKeys) {
-    if (metricKeys.isEmpty()) {
-      return Collections.emptyList();
-    }
-    List<MeasureDto> measures = newArrayList();
-    List<List<String>> partitions = Lists.partition(newArrayList(metricKeys), 1000);
-    for (List<String> partition : partitions) {
-      measures.addAll(mapper(session).selectByComponentAndMetrics(componentKey, partition));
-    }
-    return measures;
+  public List<MeasureDto> findByComponentKeyAndMetricKeys(final DbSession session, final String componentKey, List<String> metricKeys) {
+    return DaoUtils.executeLargeInputs(metricKeys, new Function<List<String>, List<MeasureDto>>() {
+      @Override
+      public List<MeasureDto> apply(List<String> keys) {
+        return mapper(session).selectByComponentAndMetrics(componentKey, keys);
+      }
+    });
   }
 
   public void insert(DbSession session, MeasureDto measureDto) {
