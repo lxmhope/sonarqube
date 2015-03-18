@@ -244,27 +244,22 @@ public class MeasureDto {
     return this;
   }
 
-  public MeasureDto setSeverity(@Nullable String severity) {
-    if (severity == null) {
-      return this;
-    }
-    checkArgument(Severity.ALL.contains(severity), "Severity must be included in the org.sonar.api.rule.Severity values");
-
-    for (int i = 0; i < Severity.ALL.size(); i++) {
-      if (Severity.ALL.get(i).equals(severity)) {
-        this.severityIndex = i;
-        return this;
-      }
-    }
-
-    return this;
-  }
-
   public String getSeverity() {
     if (severityIndex == null) {
       return null;
     }
 
     return Severity.ALL.get(severityIndex);
+  }
+
+  public MeasureDto setSeverity(@Nullable String severity) {
+    if (severity == null) {
+      return this;
+    }
+
+    checkArgument(Severity.ALL.contains(severity), "Severity must be included in the org.sonar.api.rule.Severity values");
+
+    this.severityIndex = Severity.ALL.indexOf(severity);
+    return this;
   }
 }

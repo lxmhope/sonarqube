@@ -22,25 +22,32 @@ package org.sonar.server.measure.persistence;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonar.api.rule.Severity;
 import org.sonar.core.measure.db.MeasureDto;
-import org.sonar.core.persistence.AbstractDaoTestCase;
 import org.sonar.core.persistence.DbSession;
+import org.sonar.core.persistence.DbTester;
+import org.sonar.test.DbTests;
 
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MeasureDaoTest extends AbstractDaoTestCase {
+@Category(DbTests.class)
+public class MeasureDaoTest {
+
+  @Rule
+  public DbTester db = new DbTester();
 
   DbSession session;
   MeasureDao sut;
 
   @Before
   public void setUp() {
-    session = getMyBatis().openSession(false);
+    session = db.myBatis().openSession(false);
     sut = new MeasureDao();
   }
 
@@ -51,7 +58,7 @@ public class MeasureDaoTest extends AbstractDaoTestCase {
 
   @Test
   public void get_value_by_key() throws Exception {
-    setupData("shared");
+    db.prepareDbUnit(getClass(), "shared.xml");
 
     MeasureDto result = sut.findByComponentKeyAndMetricKey(session, "org.struts:struts-core:src/org/struts/RequestContext.java", "ncloc");
     assertThat(result.getId()).isEqualTo(22);
@@ -61,7 +68,7 @@ public class MeasureDaoTest extends AbstractDaoTestCase {
   @Test
   // TODO the string must be longer than 4000 char to be persisted in the data field
   public void get_data_by_key() throws Exception {
-    setupData("shared");
+    db.prepareDbUnit(getClass(), "shared.xml");
 
     MeasureDto result = sut.findByComponentKeyAndMetricKey(session, "org.struts:struts-core:src/org/struts/RequestContext.java", "authors_by_line");
     assertThat(result.getId()).isEqualTo(20);
@@ -70,7 +77,7 @@ public class MeasureDaoTest extends AbstractDaoTestCase {
 
   @Test
   public void get_text_value_by_key() throws Exception {
-    setupData("shared");
+    db.prepareDbUnit(getClass(), "shared.xml");
 
     MeasureDto result = sut.findByComponentKeyAndMetricKey(session, "org.struts:struts-core:src/org/struts/RequestContext.java", "coverage_line_hits_data");
     assertThat(result.getId()).isEqualTo(21);
@@ -79,7 +86,7 @@ public class MeasureDaoTest extends AbstractDaoTestCase {
 
   @Test
   public void find_by_component_key_and_metrics() throws Exception {
-    setupData("shared");
+    db.prepareDbUnit(getClass(), "shared.xml");
 
     List<MeasureDto> results = sut.findByComponentKeyAndMetricKeys(session, "org.struts:struts-core:src/org/struts/RequestContext.java",
       newArrayList("ncloc", "authors_by_line"));
@@ -102,7 +109,7 @@ public class MeasureDaoTest extends AbstractDaoTestCase {
 
   @Test
   public void find_by_component_key_and_metric() throws Exception {
-    setupData("shared");
+    db.prepareDbUnit(getClass(), "shared.xml");
 
     MeasureDto result = sut.findByComponentKeyAndMetricKey(session, "org.struts:struts-core:src/org/struts/RequestContext.java", "ncloc");
     assertThat(result.getId()).isEqualTo(22);
@@ -120,7 +127,7 @@ public class MeasureDaoTest extends AbstractDaoTestCase {
 
   @Test
   public void exists_by_key() throws Exception {
-    setupData("shared");
+    db.prepareDbUnit(getClass(), "shared.xml");
 
     assertThat(sut.existsByKey(session, "org.struts:struts-core:src/org/struts/RequestContext.java", "ncloc")).isTrue();
     assertThat(sut.existsByKey(session, "org.struts:struts-core:src/org/struts/RequestContext.java", "unknown")).isFalse();
@@ -128,7 +135,7 @@ public class MeasureDaoTest extends AbstractDaoTestCase {
 
   @Test
   public void insert() throws Exception {
-    setupData("empty");
+    db.prepareDbUnit(getClass(), "empty.xml");
 
     sut.insert(session, new MeasureDto()
         .setSnapshotId(2L)
@@ -151,6 +158,6 @@ public class MeasureDaoTest extends AbstractDaoTestCase {
     );
     session.commit();
 
-    checkTable("insert", "project_measures");
+    db.assertDbUnit(getClass(), "insert-result.xml", "project_measures");
   }
 }

@@ -89,51 +89,51 @@ public class PersistMeasuresStepTest extends BaseStepTest {
       .setSnapshotId(3)
       .build());
 
+    report.writeComponent(defaultComponent()
+      .addChildRefs(2)
+      .build());
     report.writeComponent(
-      BatchReport.Component.newBuilder()
-        .setRef(1)
-        .setId(2)
-        .setSnapshotId(3)
-        .build()
-    );
+      defaultComponent()
+        .setRef(2)
+        .build());
 
     report.writeComponentMeasures(1, Arrays.asList(
-        BatchReport.Measure.newBuilder()
-          .setValueType(Constants.MeasureValueType.STRING)
-          .setStringValue("measure-data")
-          .setTendency(2)
-          .setVariationValue1(1.1d)
-          .setVariationValue2(2.2d)
-          .setVariationValue3(3.3d)
-          .setVariationValue4(4.4d)
-          .setVariationValue5(5.5d)
-          .setAlertStatus("measure-alert-status")
-          .setAlertText("measure-alert-text")
-          .setDescription("measure-description")
-          .setSeverity(Constants.Severity.INFO)
-          .setMetricKey("metric-key")
-          .setRuleKey("repo:rule-key")
-          .setCharactericId(123456)
-          .build(),
-        BatchReport.Measure.newBuilder()
-          .setValueType(Constants.MeasureValueType.DOUBLE)
-          .setDoubleValue(123.123d)
-          .setTendency(2)
-          .setVariationValue1(1.1d)
-          .setVariationValue2(2.2d)
-          .setVariationValue3(3.3d)
-          .setVariationValue4(4.4d)
-          .setVariationValue5(5.5d)
-          .setAlertStatus("measure-alert-status")
-          .setAlertText("measure-alert-text")
-          .setDescription("measure-description")
-          .setSeverity(Constants.Severity.BLOCKER)
-          .setMetricKey("metric-key")
-          .setRuleKey("repo:rule-key")
-          .setCharactericId(123456)
-          .build()
-      )
-    );
+      BatchReport.Measure.newBuilder()
+        .setValueType(Constants.MeasureValueType.STRING)
+        .setStringValue("measure-data")
+        .setTendency(2)
+        .setVariationValue1(1.1d)
+        .setVariationValue2(2.2d)
+        .setVariationValue3(3.3d)
+        .setVariationValue4(4.4d)
+        .setVariationValue5(5.5d)
+        .setAlertStatus("measure-alert-status")
+        .setAlertText("measure-alert-text")
+        .setDescription("measure-description")
+        .setSeverity(Constants.Severity.INFO)
+        .setMetricKey("metric-key")
+        .setRuleKey("repo:rule-key")
+        .setCharactericId(123456)
+        .build()));
+
+    report.writeComponentMeasures(2, Arrays.asList(
+      BatchReport.Measure.newBuilder()
+        .setValueType(Constants.MeasureValueType.DOUBLE)
+        .setDoubleValue(123.123d)
+        .setTendency(2)
+        .setVariationValue1(1.1d)
+        .setVariationValue2(2.2d)
+        .setVariationValue3(3.3d)
+        .setVariationValue4(4.4d)
+        .setVariationValue5(5.5d)
+        .setAlertStatus("measure-alert-status")
+        .setAlertText("measure-alert-text")
+        .setDescription("measure-description")
+        .setSeverity(Constants.Severity.BLOCKER)
+        .setMetricKey("metric-key")
+        .setRuleKey("repo:rule-key")
+        .setCharactericId(123456)
+        .build()));
 
     sut.execute(new ComputationContext(new BatchReportReader(dir), mock(ComponentDto.class)));
 
@@ -143,6 +143,13 @@ public class PersistMeasuresStepTest extends BaseStepTest {
     assertThat(argument.getValue().getMetricId()).isEqualTo(654);
     assertThat(argument.getValue().getRuleId()).isEqualTo(987);
     assertThat(argument.getValue().getSeverity()).isEqualTo(Severity.BLOCKER);
+  }
+
+  private BatchReport.Component.Builder defaultComponent() {
+    return BatchReport.Component.newBuilder()
+      .setRef(1)
+      .setId(2)
+      .setSnapshotId(3);
   }
 
   @Test
@@ -165,11 +172,7 @@ public class PersistMeasuresStepTest extends BaseStepTest {
       .setCharactericId(123456)
       .build();
 
-    BatchReport.Component component = BatchReport.Component.newBuilder()
-      .setRef(1)
-      .setId(2)
-      .setSnapshotId(3)
-      .build();
+    BatchReport.Component component = defaultComponent().build();
 
     MeasureDto measure = sut.toMeasureDto(batchMeasure, component);
 
@@ -186,16 +189,12 @@ public class PersistMeasuresStepTest extends BaseStepTest {
       .setRuleKey("repo:rule-key")
       .build();
 
-    BatchReport.Component component = BatchReport.Component.newBuilder()
-      .setRef(1)
-      .setId(2)
-      .setSnapshotId(3)
+    BatchReport.Component component = defaultComponent()
       .build();
 
     MeasureDto measure = sut.toMeasureDto(batchMeasure, component);
 
     assertThat(measure).isEqualToComparingFieldByField(expectedMinimalistMeasure());
-
   }
 
   private MeasureDto expectedFullMeasure() {
@@ -215,8 +214,7 @@ public class PersistMeasuresStepTest extends BaseStepTest {
       .setDescription("measure-description")
       .setSeverity(Severity.CRITICAL)
       .setMetricId(654)
-      .setRuleId(987)
-      ;
+      .setRuleId(987);
   }
 
   private MeasureDto expectedMinimalistMeasure() {
@@ -226,8 +224,7 @@ public class PersistMeasuresStepTest extends BaseStepTest {
       .setValue(123d)
       .setSeverity(Severity.INFO)
       .setMetricId(654)
-      .setRuleId(987)
-      ;
+      .setRuleId(987);
   }
 
   @Override

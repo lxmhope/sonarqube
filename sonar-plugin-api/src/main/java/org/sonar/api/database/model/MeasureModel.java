@@ -28,12 +28,7 @@ import org.sonar.api.measures.Metric;
 import org.sonar.api.rules.RulePriority;
 
 import javax.persistence.*;
-
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
-
-import static org.sonar.api.utils.DateUtils.dateToLong;
-import static org.sonar.api.utils.DateUtils.longToDate;
 
 /**
  * This class is the Hibernate model to store a measure in the DB
@@ -70,9 +65,6 @@ public class MeasureModel implements Cloneable {
   @Column(name = "description", updatable = true, nullable = true, length = 4000)
   private String description;
 
-  @Column(name = "measure_date", updatable = true, nullable = true)
-  private Long measureDate;
-
   @Column(name = "rule_id", updatable = true, nullable = true)
   private Integer ruleId;
 
@@ -100,9 +92,6 @@ public class MeasureModel implements Cloneable {
 
   @Column(name = "variation_value_5", updatable = true, nullable = true)
   private Double variationValue5;
-
-  @Column(name = "url", updatable = true, nullable = true, length = 2000)
-  private String url;
 
   @Column(name = "characteristic_id", nullable = true)
   private Integer characteristicId;
@@ -306,40 +295,6 @@ public class MeasureModel implements Cloneable {
   }
 
   /**
-   * @return the date of the measure
-   */
-  public Date getMeasureDate() {
-    return longToDate(measureDate);
-  }
-
-  /**
-   * Sets the date for the measure
-   *
-   * @return the current object
-   */
-  public MeasureModel setMeasureDate(Date measureDate) {
-    this.measureDate = dateToLong(measureDate);
-    return this;
-  }
-
-  /**
-   * @return the date of the measure
-   */
-  public Long getMeasureDateMs() {
-    return measureDate;
-  }
-
-  /**
-   * Sets the date for the measure
-   *
-   * @return the current object
-   */
-  public MeasureModel setMeasureDateMs(Long measureDate) {
-    this.measureDate = measureDate;
-    return this;
-  }
-
-  /**
    * @return the alert status if there is one, null otherwise
    */
   public Metric.Level getAlertStatus() {
@@ -412,20 +367,6 @@ public class MeasureModel implements Cloneable {
    */
   public void setAlertText(String alertText) {
     this.alertText = alertText;
-  }
-
-  /**
-   * @return the measure URL
-   */
-  public String getUrl() {
-    return url;
-  }
-
-  /**
-   * Sets the measure URL
-   */
-  public void setUrl(String url) {
-    this.url = url;
   }
 
   @Override
@@ -519,8 +460,6 @@ public class MeasureModel implements Cloneable {
     clone.setRulePriority(getRulePriority());
     clone.setRuleId(getRuleId());
     clone.setSnapshotId(getSnapshotId());
-    clone.setMeasureDate(getMeasureDate());
-    clone.setUrl(getUrl());
     clone.setCharacteristicId(getCharacteristicId());
     clone.setPersonId(getPersonId());
     return clone;
