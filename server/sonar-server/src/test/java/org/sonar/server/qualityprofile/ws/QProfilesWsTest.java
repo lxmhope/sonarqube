@@ -23,7 +23,11 @@ package org.sonar.server.qualityprofile.ws;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonar.api.i18n.I18n;
+import org.sonar.api.resources.AbstractLanguage;
+import org.sonar.api.resources.Language;
+import org.sonar.api.resources.Languages;
 import org.sonar.api.server.ws.WebService;
+import org.sonar.server.qualityprofile.QProfileLookup;
 import org.sonar.server.qualityprofile.QProfileService;
 import org.sonar.server.rule.RuleService;
 import org.sonar.server.ws.WsTester;
@@ -37,11 +41,25 @@ public class QProfilesWsTest {
 
   @Before
   public void setUp() {
+    Language xoo1 = new AbstractLanguage("xoo1", "Xoo1") {
+      @Override
+      public String[] getFileSuffixes() {
+        return new String[] {"xoo1"};
+      }
+    };
+    Language xoo2 = new AbstractLanguage("xoo2", "Xoo2") {
+      @Override
+      public String[] getFileSuffixes() {
+        return new String[] {"xoo2"};
+      }
+    };
+
     QProfileService profileService = mock(QProfileService.class);
     RuleService ruleService = mock(RuleService.class);
     I18n i18n = mock(I18n.class);
     controller = new WsTester(new QProfilesWs(new QProfileRestoreBuiltInAction(
       mock(QProfileService.class)),
+      new QProfileSearchAction(new Languages(xoo1, xoo2), mock(QProfileLookup.class)),
       new RuleActivationActions(profileService),
       new BulkRuleActivationActions(profileService, ruleService, i18n)
     )).controller(QProfilesWs.API_ENDPOINT);
@@ -52,7 +70,7 @@ public class QProfilesWsTest {
     assertThat(controller).isNotNull();
     assertThat(controller.path()).isEqualTo(QProfilesWs.API_ENDPOINT);
     assertThat(controller.description()).isNotEmpty();
-    assertThat(controller.actions()).hasSize(5);
+    assertThat(controller.actions()).hasSize(6);
   }
 
   @Test
@@ -61,6 +79,15 @@ public class QProfilesWsTest {
     assertThat(restoreProfiles).isNotNull();
     assertThat(restoreProfiles.isPost()).isTrue();
     assertThat(restoreProfiles.params()).hasSize(1);
+  }
+
+  @Test
+  public void define_search() throws Exception {
+    WebService.Action search = controller.action("search");
+    assertThat(search).isNotNull();
+    assertThat(search.isPost()).isFalse();
+    assertThat(search.params()).hasSize(1);
+    assertThat(search.param("language").possibleValues()).containsOnly("xoo1", "xoo2");
   }
 
   @Test

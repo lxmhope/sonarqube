@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sonar.api.i18n.I18n;
+import org.sonar.api.resources.Languages;
 import org.sonar.server.qualityprofile.QProfileService;
 import org.sonar.server.rule.RuleService;
 import org.sonar.server.ws.WsTester;
@@ -49,6 +50,7 @@ public class QProfileRestoreBuiltInActionTest {
     RuleService ruleService = mock(RuleService.class);
     tester = new WsTester(new QProfilesWs(
       new QProfileRestoreBuiltInAction(this.profileService),
+      new QProfileSearchAction(new Languages(), null),
       new RuleActivationActions(profileService),
       new BulkRuleActivationActions(profileService, ruleService, i18n)));
   }
