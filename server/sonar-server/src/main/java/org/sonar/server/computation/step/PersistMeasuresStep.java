@@ -36,6 +36,9 @@ import org.sonar.server.db.DbClient;
 
 import java.util.List;
 
+import static org.sonar.server.computation.measure.BatchReportMeasureUtils.checkMeasure;
+import static org.sonar.server.computation.measure.BatchReportMeasureUtils.valueAsDouble;
+
 public class PersistMeasuresStep implements ComputationStep {
 
   private final DbClient dbClient;
@@ -63,7 +66,6 @@ public class PersistMeasuresStep implements ComputationStep {
     int rootComponentRef = context.getReportMetadata().getRootComponentRef();
     try (DbSession dbSession = dbClient.openSession(true)) {
       recursivelyProcessComponent(dbSession, context, rootComponentRef);
-      dbSession.flushStatements();
       dbSession.commit();
     }
   }
@@ -72,13 +74,13 @@ public class PersistMeasuresStep implements ComputationStep {
     BatchReportReader reportReader = context.getReportReader();
     BatchReport.Component component = reportReader.readComponent(componentRef);
     List<BatchReport.Measure> measures = reportReader.readComponentMeasures(componentRef);
-    persistMeasures(dbSession, measures, component, context);
+    persistMeasures(dbSession, measures, component);
     for (Integer childRef : component.getChildRefList()) {
       recursivelyProcessComponent(dbSession, context, childRef);
     }
   }
 
-  private void persistMeasures(DbSession dbSession, List<BatchReport.Measure> batchReportMeasures, final BatchReport.Component component, final ComputationContext context) {
+  private void persistMeasures(DbSession dbSession, List<BatchReport.Measure> batchReportMeasures, final BatchReport.Component component) {
     List<MeasureDto> measures = Lists.transform(batchReportMeasures, new Function<BatchReport.Measure, MeasureDto>() {
       @Override
       public MeasureDto apply(BatchReport.Measure batchMeasure) {
@@ -93,39 +95,26 @@ public class PersistMeasuresStep implements ComputationStep {
 
   @VisibleForTesting
   MeasureDto toMeasureDto(BatchReport.Measure in, BatchReport.Component component) {
+    checkMeasure(in);
+
     MeasureDto out = new MeasureDto()
-      .setTendency(in.hasTendency()?in.getTendency():null)
-      .setVariation(1,in.hasVariationValue1()?in.getVariationValue1():null)
-      .setVariation(2,in.hasVariationValue2()?in.getVariationValue2():null)
-      .setVariation(3,in.hasVariationValue3()?in.getVariationValue3():null)
-      .setVariation(4,in.hasVariationValue4()?in.getVariationValue4():null)
-      .setVariation(5,in.hasVariationValue5()?in.getVariationValue5():null)
-      .setAlertStatus(in.hasAlertStatus()?in.getAlertStatus():null)
-      .setAlertText(in.hasAlertText()?in.getAlertText():null)
-      .setDescription(in.hasDescription()?in.getDescription():null)
-      .setSeverity(in.hasSeverity()?in.getSeverity().name():null)
+      .setTendency(in.hasTendency() ? in.getTendency() : null)
+      .setVariation(1, in.hasVariationValue1() ? in.getVariationValue1() : null)
+      .setVariation(2, in.hasVariationValue2() ? in.getVariationValue2() : null)
+      .setVariation(3, in.hasVariationValue3() ? in.getVariationValue3() : null)
+      .setVariation(4, in.hasVariationValue4() ? in.getVariationValue4() : null)
+      .setVariation(5, in.hasVariationValue5() ? in.getVariationValue5() : null)
+      .setAlertStatus(in.hasAlertStatus() ? in.getAlertStatus() : null)
+      .setAlertText(in.hasAlertText() ? in.getAlertText() : null)
+      .setDescription(in.hasDescription() ? in.getDescription() : null)
+      .setSeverity(in.hasSeverity() ? in.getSeverity().name() : null)
       .setComponentId(component.getId())
       .setSnapshotId(component.getSnapshotId())
       .setMetricId(metricCache.get(in.getMetricKey()).getId())
       .setRuleId(ruleCache.get(RuleKey.parse(in.getRuleKey())).getId())
       .setCharacteristicId(in.hasCharactericId() ? in.getCharactericId() : null);
-    out.setValue(measureValue(in));
+    out.setValue(valueAsDouble(in));
     out.setData(in.hasStringValue() ? in.getStringValue() : null);
     return out;
-  }
-
-  private Double measureValue(BatchReport.Measure measure) {
-    switch (measure.getValueType()) {
-      case BOOLEAN:
-        return measure.getBooleanValue() ? 1.0d : 0.0d;
-      case INT:
-        return Double.valueOf(measure.getIntValue());
-      case LONG:
-        return Double.valueOf(measure.getLongValue());
-      case DOUBLE:
-        return measure.getDoubleValue();
-      default:
-        return null;
-    }
   }
 }

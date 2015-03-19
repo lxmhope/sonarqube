@@ -20,11 +20,37 @@
 
 package org.sonar.server.computation.measure;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import org.sonar.core.measure.db.MetricDto;
-import org.sonar.server.util.cache.MemoryCache;
+import org.sonar.core.persistence.DbSession;
+import org.sonar.server.db.DbClient;
+import org.sonar.server.exceptions.NotFoundException;
 
-public class MetricCache extends MemoryCache<String, MetricDto> {
-  public MetricCache(MetricCacheLoader loader) {
-    super(loader);
+import java.util.List;
+import java.util.Map;
+
+public class MetricCache {
+  private final Map<String, MetricDto> metrics;
+
+  public MetricCache(DbClient dbClient) {
+    try (DbSession dbSession = dbClient.openSession(false)) {
+      List<MetricDto> metricList = dbClient.metricDao().findEnabled(dbSession);
+      this.metrics = Maps.uniqueIndex(metricList, new Function<MetricDto, String>() {
+        @Override
+        public String apply(MetricDto metric) {
+          return metric.getKey();
+        }
+      });
+    }
+  }
+
+  public MetricDto get(String key) {
+    MetricDto metric = metrics.get(key);
+    if (metric == null) {
+      throw new NotFoundException(String.format("Not found: '%s'", key));
+    }
+
+    return metric;
   }
 }

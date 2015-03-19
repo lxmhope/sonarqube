@@ -23,7 +23,6 @@ import org.sonar.api.platform.ComponentContainer;
 import org.sonar.core.issue.db.UpdateConflictResolver;
 import org.sonar.server.computation.issue.*;
 import org.sonar.server.computation.measure.MetricCache;
-import org.sonar.server.computation.measure.MetricCacheLoader;
 import org.sonar.server.computation.step.ComputationSteps;
 import org.sonar.server.platform.Platform;
 import org.sonar.server.view.index.ViewIndex;
@@ -32,22 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ComputationContainer {
-
-  public void execute(ReportQueue.Item item) {
-    ComponentContainer container = Platform.getInstance().getContainer();
-    ComponentContainer child = container.createChild();
-    child.addSingletons(componentClasses());
-    child.addSingletons(ComputationSteps.orderedStepClasses());
-    child.startComponents();
-    try {
-      child.getComponentByType(ComputationService.class).process(item);
-    } finally {
-      child.stopComponents();
-      // TODO not possible to have multiple children -> will be
-      // a problem when we will have multiple concurrent computation workers
-      container.removeChild();
-    }
-  }
 
   /**
    * List of all objects to be injected in the picocontainer dedicated to computation stack.
@@ -67,10 +50,25 @@ public class ComputationContainer {
       RuleCacheLoader.class,
       IssueCache.class,
       MetricCache.class,
-      MetricCacheLoader.class,
       UpdateConflictResolver.class,
 
       // views
       ViewIndex.class);
+  }
+
+  public void execute(ReportQueue.Item item) {
+    ComponentContainer container = Platform.getInstance().getContainer();
+    ComponentContainer child = container.createChild();
+    child.addSingletons(componentClasses());
+    child.addSingletons(ComputationSteps.orderedStepClasses());
+    child.startComponents();
+    try {
+      child.getComponentByType(ComputationService.class).process(item);
+    } finally {
+      child.stopComponents();
+      // TODO not possible to have multiple children -> will be
+      // a problem when we will have multiple concurrent computation workers
+      container.removeChild();
+    }
   }
 }

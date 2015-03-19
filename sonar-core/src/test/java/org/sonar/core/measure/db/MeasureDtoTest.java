@@ -22,6 +22,7 @@ package org.sonar.core.measure.db;
 
 import com.google.common.base.Strings;
 import org.junit.Test;
+import org.sonar.api.rule.Severity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,11 +66,26 @@ public class MeasureDtoTest {
 
   @Test(expected = IndexOutOfBoundsException.class)
   public void fail_to_set_out_of_bounds_variation() throws Exception {
-      sut.setVariation(6, 1d);
+    sut.setVariation(6, 1d);
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
   public void fail_to_get_out_of_bounds_variation() throws Exception {
-      sut.getVariation(6);
+    sut.getVariation(6);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void fail_if_non_existent_severity() throws Exception {
+    sut.setSeverity("MAYOR");
+  }
+
+  @Test
+  public void severity_values_are_retrieved() throws Exception {
+    assertThat(sut.getSeverity()).isNull();
+
+    for (String severity : Severity.ALL) {
+      sut = new MeasureDto().setSeverity(severity);
+      assertThat(sut.getSeverity()).isEqualTo(severity);
+    }
   }
 }

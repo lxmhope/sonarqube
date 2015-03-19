@@ -20,33 +20,37 @@
 
 package org.sonar.server.computation.measure;
 
-import org.sonar.core.measure.db.MetricDto;
-import org.sonar.core.persistence.DbSession;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.sonar.core.persistence.DbTester;
 import org.sonar.server.db.DbClient;
-import org.sonar.server.util.cache.CacheLoader;
+import org.sonar.server.exceptions.NotFoundException;
+import org.sonar.server.measure.persistence.MetricDao;
 
-import java.util.Collection;
-import java.util.Map;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class MetricCacheLoader implements CacheLoader<String, MetricDto> {
+public class MetricCacheTest {
 
-  private final DbClient dbClient;
+  @ClassRule
+  public static DbTester db = new DbTester();
 
-  public MetricCacheLoader(DbClient dbClient) {
-    this.dbClient = dbClient;
+  MetricCache sut;
+
+  @Before
+  public void setUp() throws Exception {
+    db.prepareDbUnit(getClass(), "metrics.xml");
+    sut = new MetricCache(new DbClient(db.database(), db.myBatis(), new MetricDao()));
   }
 
-  @Override
-  public MetricDto load(String key) {
-    try (DbSession dbSession = dbClient.openSession(false)) {
-      return dbClient.metricDao().getNullableByKey(dbSession, key);
-    }
+  @Test
+  public void cache_give_access_to_enabled_metrics() throws Exception {
+    assertThat(sut.get("ncloc").getId()).isEqualTo(1);
+    assertThat(sut.get("coverage").getId()).isEqualTo(2);
   }
 
-  @Override
-  public Map<String, MetricDto> loadAll(Collection<? extends String> keys) {
-    throw new UnsupportedOperationException("see MetricCacheLoader.load");
+  @Test(expected = NotFoundException.class)
+  public void fail_when_metric_not_found() throws Exception {
+    sut.get("complexity");
   }
-
-
 }

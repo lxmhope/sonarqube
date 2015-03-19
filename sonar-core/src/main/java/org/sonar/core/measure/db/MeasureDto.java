@@ -96,6 +96,7 @@ public class MeasureDto {
     return this;
   }
 
+  @CheckForNull
   public Double getVariation(int index) {
     switch (index) {
       case 1:
@@ -136,6 +137,7 @@ public class MeasureDto {
     return this;
   }
 
+  @CheckForNull
   public Integer getTendency() {
     return tendency;
   }
@@ -145,6 +147,7 @@ public class MeasureDto {
     return this;
   }
 
+  @CheckForNull
   public String getAlertStatus() {
     return alertStatus;
   }
@@ -154,6 +157,7 @@ public class MeasureDto {
     return this;
   }
 
+  @CheckForNull
   public String getAlertText() {
     return alertText;
   }
@@ -163,6 +167,7 @@ public class MeasureDto {
     return this;
   }
 
+  @CheckForNull
   public String getDescription() {
     return description;
   }
@@ -244,27 +249,23 @@ public class MeasureDto {
     return this;
   }
 
-  public MeasureDto setSeverity(@Nullable String severity) {
-    if (severity == null) {
-      return this;
-    }
-    checkArgument(Severity.ALL.contains(severity), "Severity must be included in the org.sonar.api.rule.Severity values");
-
-    for (int i = 0; i < Severity.ALL.size(); i++) {
-      if (Severity.ALL.get(i).equals(severity)) {
-        this.severityIndex = i;
-        return this;
-      }
-    }
-
-    return this;
-  }
-
+  @CheckForNull
   public String getSeverity() {
     if (severityIndex == null) {
       return null;
     }
 
     return Severity.ALL.get(severityIndex);
+  }
+
+  public MeasureDto setSeverity(@Nullable String severity) {
+    if (severity == null) {
+      return this;
+    }
+
+    checkArgument(Severity.ALL.contains(severity), "Severity must be included in the org.sonar.api.rule.Severity values");
+
+    this.severityIndex = Severity.ALL.indexOf(severity);
+    return this;
   }
 }
