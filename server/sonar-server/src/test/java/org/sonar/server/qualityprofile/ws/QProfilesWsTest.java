@@ -86,8 +86,9 @@ public class QProfilesWsTest {
     WebService.Action search = controller.action("search");
     assertThat(search).isNotNull();
     assertThat(search.isPost()).isFalse();
-    assertThat(search.params()).hasSize(1);
+    assertThat(search.params()).hasSize(2);
     assertThat(search.param("language").possibleValues()).containsOnly("xoo1", "xoo2");
+    assertThat(search.param("f").possibleValues()).containsOnly("key", "name", "language", "isInherited", "parentKey");
   }
 
   @Test

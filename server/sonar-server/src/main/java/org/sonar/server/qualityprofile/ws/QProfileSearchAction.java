@@ -20,7 +20,9 @@
 package org.sonar.server.qualityprofile.ws;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
 import org.sonar.api.resources.Language;
 import org.sonar.api.resources.Languages;
 import org.sonar.api.server.ws.*;
@@ -29,14 +31,20 @@ import org.sonar.api.utils.text.JsonWriter;
 import org.sonar.server.qualityprofile.QProfile;
 import org.sonar.server.qualityprofile.QProfileLookup;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class QProfileSearchAction implements RequestHandler {
 
-  private static final String PARAM_LANGUAGE = "language";
+  private static final String FIELD_KEY = "key";
+  private static final String FIELD_NAME = "name";
+  private static final String FIELD_LANGUAGE = "language";
+  private static final String FIELD_IS_INHERITED = "isInherited";
+  private static final String FIELD_PARENT_KEY = "parentKey";
+  private static final Set<String> ALL_FIELDS = ImmutableSet.of(FIELD_KEY, FIELD_NAME, FIELD_LANGUAGE, FIELD_IS_INHERITED, FIELD_PARENT_KEY);
+
+  private static final String PARAM_LANGUAGE = FIELD_LANGUAGE;
+  private static final String PARAM_FIELDS = "f";
+
 
   private final Languages languages;
 
@@ -49,6 +57,9 @@ public class QProfileSearchAction implements RequestHandler {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
+    List<String> fields = request.paramAsStrings(PARAM_FIELDS);
+    Preconditions.checkArgument(fields == null || ALL_FIELDS.containsAll(fields));
+
     String language = request.param(PARAM_LANGUAGE);
 
     List<QProfile> profiles = null;
@@ -70,24 +81,35 @@ public class QProfileSearchAction implements RequestHandler {
     });
 
     JsonWriter json = response.newJsonWriter().beginObject();
-    writeProfiles(json, profiles);
+    writeProfiles(json, profiles, fields);
     writeLanguages(json);
     json.endObject().close();
   }
 
-  private void writeProfiles(JsonWriter json, List<QProfile> profiles) {
+  private void writeProfiles(JsonWriter json, List<QProfile> profiles, List<String> fields) {
     json.name("profiles")
       .beginArray();
     for (QProfile profile : profiles) {
       json.beginObject()
-        .prop("key", profile.key())
-        .prop("name", profile.name())
-        .prop("language", profile.language())
-        .prop("isInherited", profile.isInherited())
-        .prop("parentKey", profile.parent())
-        .endObject();
+        .prop(FIELD_KEY, nullUnlessNeeded(FIELD_KEY, profile.key(), fields))
+        .prop(FIELD_NAME, nullUnlessNeeded(FIELD_NAME, profile.name(), fields))
+        .prop(FIELD_LANGUAGE, nullUnlessNeeded(FIELD_LANGUAGE, profile.language(), fields))
+        .prop(FIELD_PARENT_KEY, nullUnlessNeeded(FIELD_PARENT_KEY, profile.parent(), fields));
+      // Special case for boolean
+      if (fieldIsNeeded(FIELD_IS_INHERITED, fields)) {
+        json.prop(FIELD_IS_INHERITED, profile.isInherited());
+      }
+      json.endObject();
     }
     json.endArray();
+  }
+
+  private <T> T nullUnlessNeeded(String field, T value, List<String> fields) {
+    return fieldIsNeeded(field, fields) ? value : null;
+  }
+
+  private boolean fieldIsNeeded(String field, List<String> fields) {
+    return fields == null || fields.contains(field);
   }
 
   private void writeLanguages(JsonWriter json) {
@@ -95,8 +117,8 @@ public class QProfileSearchAction implements RequestHandler {
       .beginArray();
     for (Language language : languages.all()) {
       json.beginObject()
-        .prop("key", language.getKey())
-        .prop("name", language.getName())
+        .prop(FIELD_KEY, language.getKey())
+        .prop(FIELD_NAME, language.getName())
         .endObject();
     }
     json.endArray();
@@ -118,6 +140,11 @@ public class QProfileSearchAction implements RequestHandler {
           return input.getKey();
         }
       }));
+
+    search.createParam(PARAM_FIELDS)
+      .setDescription("Use to restrict returned fields")
+      .setExampleValue("key,language")
+      .setPossibleValues(ALL_FIELDS);
   }
 
 }

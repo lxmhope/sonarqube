@@ -82,6 +82,18 @@ public class QProfileSearchActionTest {
   }
 
   @Test
+  public void search_with_fields() throws Exception {
+    List<QProfile> profiles = Arrays.asList(
+      new QProfile().setKey("sonar-way-xoo1-12345").setLanguage(xoo1.getKey()).setName("Sonar way"),
+      new QProfile().setKey("sonar-way-xoo2-23456").setLanguage(xoo2.getKey()).setName("Sonar way"),
+      new QProfile().setKey("my-sonar-way-xoo2-34567").setLanguage(xoo2.getKey()).setName("My Sonar way").setParent("sonar-way-xoo2-23456")
+      );
+    when(profileLookup.allProfiles()).thenReturn(profiles);
+
+    tester.newGetRequest("api/qualityprofiles", "search").setParam("f", "key,language").execute().assertJson(this.getClass(), "search_fields.json");
+  }
+
+  @Test
   public void search_for_language() throws Exception {
     List<QProfile> profiles = Arrays.asList(
       new QProfile().setKey("sonar-way-xoo1-12345").setLanguage(xoo1.getKey()).setName("Sonar way")
